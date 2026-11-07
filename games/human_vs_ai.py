@@ -21,8 +21,8 @@ def human_play(env, info):
     is_placing = all(src == 0 for src, _, _, in legal_move_tuples)
     sources = sorted({ src for src, _, _ in legal_move_tuples })
 
-    stage = "src"
-    if not is_placing: stage = "dst"
+    stage = "dst"
+    if not is_placing: stage = "src"
 
     src = 0
     if not is_placing: src = None
@@ -113,7 +113,6 @@ def main():
     parser.add_argument("--side", type = int, choices=[1, 2], default = 1)
     parser.add_argument("--seed", type = int, default = None)
     parser.add_argument("--log", default = "results/human-vs-ai.csv")
-    parser.add_argument("--username", default = "Human")
 
     args = parser.parse_args()
 
@@ -128,12 +127,14 @@ def main():
     agent_time = 0.0
     agent_moves = 0
 
+    human_name = f"player_{args.side}"
+
     for name in env.agent_iter():
         _, _, termination, truncation, info = env.last()
 
         if termination:
             # The name has lost.
-            if name == args.username: outcome = "agent"
+            if name == human_name: outcome = "agent"
             else: outcome = "human"
 
             break
@@ -142,7 +143,7 @@ def main():
             if info.get("move") > 100: outcome = "draw"
             break
 
-        if name == args.username:
+        if name == human_name:
             move = human_play(env, info)
 
             if move is None:
@@ -150,15 +151,17 @@ def main():
                 break
 
         else:
-            # info["move"] - 1 in order to get total number of rounds (round = 2 * turn).
+            agent_side = 3 - args.side
+            
+            # info["move"] - 1 in order to get total number of rounds (round = 2turns).
             # We have to subtract 1 from info["move"], because "move" starts from 1.
-            # args.side - 1 represents the current round being played (its progress).
-            turns = 2 * (info["move"] - 1) + args.side - 1
+            # agent_side - 1 represents the current round being played (its progress).
+            turns = 2 * (info["move"] - 1) + agent_side - 1
 
             model = mill.transition_model(env.unwrapped)
             start = time.perf_counter()
 
-            move = agent.play(model, args.side, turns)
+            move = agent.play(model, agent_side, turns)
 
             agent_time += time.perf_counter() - start
             agent_moves += 1
@@ -167,34 +170,34 @@ def main():
 
         turns += 1
 
-        if outcome is not None:
-            message = {
-                "human": "You won!",
-                "agent": "The AI won.",
-                "draw": "Draw, game was too long."
-            }
+    if outcome is not None:
+        message = {
+            "human": "You won!",
+            "agent": "The AI won.",
+            "draw": "Draw, game was too long."
+        }
 
-            print(message[outcome])
+        print(message[outcome])
 
-            log_result(args.log, {
-                "time": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "difficulty": args.level,
-                "human_side": args.side,
-                "agent_side": 3 - args.side,
-                "outcome": outcome,
-                "turns": turns,
-                "agent_mean_thinking_time": round(agent_time / agent_moves, 3) if agent_moves else ""
-            })
+        log_result(args.log, {
+            "time": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "difficulty": args.difficulty,
+            "human_side": args.side,
+            "agent_side": 3 - args.side,
+            "outcome": outcome,
+            "turns": turns,
+            "agent_mean_thinking_time": round(agent_time / agent_moves, 3) if agent_moves else ""
+        })
 
-            print("Press any key in the window to exit.")
+        print("Press any key in the window to exit.")
 
-            while True:
-                interaction = env.interact()
+        while True:
+            interaction = env.interact()
 
-                if interaction["type"] in ("quit", "key_press"):
-                    break
+            if interaction["type"] in ("quit", "key_press"):
+                break
 
-        env.close()
+    env.close()
 
-    if __name__ == "__main__":
-        main()
+if __name__ == "__main__":
+    main()

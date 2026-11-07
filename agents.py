@@ -9,7 +9,7 @@ class RandomAgent:
         self.name = name
         self.random = r.Random(seed)
 
-    def play(self, model, player):
+    def play(self, model, player, turns):
         moves = model.legal_moves(player)
         return moves[self.random.randrange(len(moves))]
 
@@ -65,7 +65,7 @@ def build_agent(props, seed):
     props = dict(props) # A copy of properties, to avoid editing the passed ones.
 
     agent = props.pop("agent")
-    name = props.pop("name")
 
-    if agent == "random": return RandomAgent(seed=seed, name=name)
-    if agent == "mcts": return MCTSAgent(seed=seed, name=name, **props) # Spreading all other properties.
+    # Spreading all other properties, **props.
+    if agent == "random": return RandomAgent(seed = seed, **props)
+    if agent == "mcts": return MCTSAgent(seed = seed, **props)

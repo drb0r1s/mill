@@ -4,7 +4,7 @@ import random as r
 class Node:
     __slots__ = ("model", "current_player", "prev_player", "turns", "move", "parent", "children", "not_tried", "visits", "total_reward", "is_terminal", "depth")
 
-    def __init__(self, model, current_player, turns, max_turns, move = None, parent = None):
+    def __init__(self, model, current_player, turns, max_turns, random, move = None, parent = None):
         self.model = model
         self.current_player = current_player
         self.prev_player = 3 - current_player
@@ -16,7 +16,7 @@ class Node:
         self.total_reward = 0.0
 
         if parent is None: self.depth = 0
-        else: parent.depth + 1
+        else: self.depth = parent.depth + 1
 
         if model.game_over() or turns >= max_turns:
             self.not_tried = []
@@ -24,7 +24,7 @@ class Node:
 
         else:
             self.not_tried = model.legal_moves(current_player)
-            r.shuffle(self.not_tried)
+            random.shuffle(self.not_tried)
 
             self.is_terminal = len(self.not_tried) == 0
 
@@ -41,7 +41,7 @@ class MCTS:
 
         self.last_stats = {}
 
-    def select(self, model, player, turn = 0):
+    def search(self, model, player, turn = 0):
         root = Node(model.clone(), player, turn, self.max_turns, self.random)
 
         if root.is_terminal: return None
@@ -106,7 +106,7 @@ class MCTS:
         model = node.model.clone()
         model.make_move(node.current_player, move)
 
-        child = Node(model, 3 - node.current_player, node.turn + 1, self.max_turns, self.random, move = move, parent = node)
+        child = Node(model, 3 - node.current_player, node.turns + 1, self.max_turns, self.random, move = move, parent = node)
         node.children.append(child)
 
         return child
@@ -117,16 +117,19 @@ class MCTS:
 
         model = node.model.clone()
 
-        while not model.game_over() and node.turns < self.max_turns:
-            moves = model.legal_moves(node.current_player)
-            model.make_move(node.current_player, moves[self.random.randrange(len(moves))])
+        current_player = node.current_player
+        turns = node.turns
 
-            node.current_player = 3 - node.current_player
-            node.turns += 1
+        while not model.game_over() and turns < self.max_turns:
+            moves = model.legal_moves(current_player)
+            model.make_move(current_player, moves[self.random.randrange(len(moves))])
+
+            current_player = 3 - current_player
+            turns += 1
 
         return self._get_reward(model, player)
 
-    def _get_reward(model, player):
+    def _get_reward(self, model, player):
         if model.get_phase(player) == "lost": return -1.0
         if model.get_phase(3 - player) == "lost": return 1.0
 
