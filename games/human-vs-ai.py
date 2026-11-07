@@ -7,8 +7,9 @@ from famnit_gym.envs import mill
 from famnit_gym.wrappers.mill import UserInteraction
 
 from agents import build_agent
-from difficulties import DIFFICULTIES
-from colors import RED, GREEN, YELLOW
+
+from data.difficulties import DIFFICULTIES
+from data.colors import RED, GREEN, YELLOW
 
 def human_play(env, info):
     legal_move_tuples = []    
