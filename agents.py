@@ -5,7 +5,7 @@ from mcts import MCTS
 class RandomAgent:
     __slots__ = ("name", "random")
 
-    def __init__(self, name = "random", seed = None):
+    def __init__(self, name = "Random", seed = None):
         self.name = name
         self.random = r.Random(seed)
 
