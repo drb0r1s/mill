@@ -11,12 +11,12 @@ def main():
     parser.add_argument("--games", type = int, default = 20) # Games per pair of levels
     parser.add_argument("--workers", type = int, default = None)
     parser.add_argument("--seed", type = int, default = 1)
-    parser.add_argument("--out", default = "results/difficulty_competition.cvs")
+    parser.add_argument("--out", default = "results/difficulty_competition.csv")
 
     args = parser.parse_args()
 
     props = {}
-    for difficulty in args.difficulties: props[difficulty] = dict(DIFFICULTIES[difficulty], difficulty = difficulty)
+    for difficulty in args.difficulties: props[difficulty] = dict(DIFFICULTIES[difficulty], name = difficulty)
 
     all_game_stats = []
 
@@ -36,8 +36,8 @@ def main():
                 "id": "difficulty_competition",
                 "game": game,
                 "seed": f"{args.seed} difficulty_competition {player1} {player2} {game}",
-                "props_1": props[player1],
-                "props_2": props[player2]
+                "player_1_props": props[player1],
+                "player_2_props": props[player2]
             })
 
         all_game_stats += run_tasks(play_tasks, args.workers)
@@ -45,7 +45,7 @@ def main():
     write_csv(args.out, all_game_stats)
 
     print(f"Difficulty competition, {args.games} games per pair. (win = 1, draw = 0.5, loss = 0)\n")
-    print(f"{'':>8}" + " ".join(f"{difficulty}" for difficulty in args.difficulties) + f"{'points':>8}")
+    print(f"{'':>8}" + " ".join(f"{difficulty:>8}" for difficulty in args.difficulties) + f"{'points':>8}")
 
     for first_difficulty in args.difficulties:
         cells = []
