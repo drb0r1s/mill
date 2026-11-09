@@ -37,7 +37,7 @@ def mean_stats(all_game_stats, name, key):
 
     for game_stats in all_game_stats:
         for side in ("player_1", "player_2"):
-            if game_stats[side] == name and game_stats[f"{key}_{side}"] != "":
-                values.append(game_stats[f"{key}_{side}"])
+            if game_stats[side] == name and game_stats[f"{side}_{key}"] != "":
+                values.append(game_stats[f"{side}_{key}"])
 
     return sum(values) / len(values) if values else float('nan')

@@ -1,3 +1,5 @@
+# Using the User Interaction wrapper to implement human vs AI gameplay.
+
 import os
 import csv
 import argparse

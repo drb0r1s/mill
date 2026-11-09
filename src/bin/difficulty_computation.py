@@ -1,3 +1,5 @@
+# Exploring how computation time increases with AI difficulty.
+
 import argparse
 import random as r
 import time
@@ -85,7 +87,7 @@ def main():
     write_csv(args.out, all_game_stats)
 
     print("\nMean seconds per move")
-    print(f"{"iterations":>10} " + " ".join(f"{name[:24]:>25.3f}" for name, _, _ in INTERVALS))
+    print(f"{"iterations":>10} " + " ".join(f"{name[:24]:>25}" for name, _, _ in INTERVALS))
 
     for iterations in args.iterations:
         cells = []
@@ -94,6 +96,6 @@ def main():
             for game_stats in all_game_stats:
                 if game_stats["positions"] == name and game_stats["iterations"] == iterations: cells.append(game_stats["mean_time"])
 
-        print(f"{iterations:>10}" + " ".join(f"{cell:>25}" for cell in cells))
+        print(f"{iterations:>10}" + " ".join(f"{cell:>25.3f}" for cell in cells))
 
 if __name__ == "__main__": main()

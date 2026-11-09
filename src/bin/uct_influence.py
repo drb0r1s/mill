@@ -1,3 +1,5 @@
+# Exploring how different values of the UCT function affect the gameplay.
+
 import argparse
 import math
 import itertools

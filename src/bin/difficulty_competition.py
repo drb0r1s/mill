@@ -1,3 +1,5 @@
+# Different difficulties competing against each other.
+
 import argparse
 import itertools
 
