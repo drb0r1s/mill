@@ -103,7 +103,7 @@ def play_task(task):
 
     return game_stats
 
-def run_tasks(tasks, workers = None):
+def run_tasks(tasks, workers = None, description = ""):
     workers = workers or os.cpu_count() or 1
 
     all_game_stats = []
@@ -113,7 +113,7 @@ def run_tasks(tasks, workers = None):
 
     def progress(finished_tasks_amount):
         elapsed = time.perf_counter() - start
-        print(f"{finished_tasks_amount}/{total_tasks_amunt} games, {elapsed:.0f}s", file = sys.stderr, flush = True)
+        print(f"{description} {finished_tasks_amount}/{total_tasks_amunt} games, {elapsed:.0f}s", file = sys.stderr, flush = True)
 
     if workers <= 1:
         for index, task in enumerate(tasks, 1):
