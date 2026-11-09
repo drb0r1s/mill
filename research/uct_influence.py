@@ -28,8 +28,8 @@ def make_tasks(id, player1, player2, games, seed):
             "id": id,
             "game": game,
             "seed": f"{seed} {id} {player1["name"]} {player2["name"]} {game}",
-            "player_1": first_player,
-            "player_2": second_player
+            "player_1_props": first_player,
+            "player_2_props": second_player
         })
 
     return tasks
