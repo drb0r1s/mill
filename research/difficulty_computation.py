@@ -9,10 +9,10 @@ from mcts import MCTS
 from games.ai_vs_ai import write_csv
 
 INTERVALS = [
-    ("early placing [0, 9]", 0, 9),
-    ("late placing [10, 19]", 10, 19),
-    ("moving [20, 39]", 20, 39),
-    ("flying [40, 79]", 40, 79)
+    ("[EARLY] placing [0, 9]", 0, 9),
+    ("[EARLY] late placing [10, 17]", 10, 17),
+    ("[MIDDLE] moving [20, 39]", 20, 39),
+    ("[LATE] moving or flying [40, 79]", 40, 79)
 ]
 
 def random_positions(count, bottom, top, random):
@@ -36,6 +36,10 @@ def random_positions(count, bottom, top, random):
             turns += 1
 
         if not model.game_over(): positions.append((model, player, turns))
+
+    env.close()
+
+    return positions
 
 def main():
     parser = argparse.ArgumentParser(description = "Mill: Computation time / AI difficulty")
@@ -66,14 +70,14 @@ def main():
                 times.append(time.perf_counter() - start)
 
             mean_time = statistics.mean(times)
-            standard_deviation_time = 1000 * mean_time / iterations
+            ms_per_iteration = 1000 * mean_time / iterations
 
             all_game_stats.append({
                 "positions": name,
                 "iterations": iterations,
                 "mean_time": mean_time,
                 "standard_deviation_time": statistics.stdev(times) if len(times) > 1 else 0.0,
-                "ms_per_iteration": standard_deviation_time
+                "ms_per_iteration": ms_per_iteration
             })
 
             print(f"{name:<26} {iterations:>5} iterations: {mean_time:8.3f} s / move, {1000 * mean_time / iterations:.2f} ms / iteration", flush = True)
@@ -81,7 +85,7 @@ def main():
     write_csv(args.out, all_game_stats)
 
     print("\nMean seconds per move")
-    print(f"{"iterations":>10}" + " ".join(f"{name[:24]:>25}" for name, _, _ in INTERVALS))
+    print(f"{"iterations":>10} " + " ".join(f"{name[:24]:>25.3f}" for name, _, _ in INTERVALS))
 
     for iterations in args.iterations:
         cells = []
