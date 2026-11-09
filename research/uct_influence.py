@@ -4,12 +4,12 @@ import itertools
 
 from games.ai_vs_ai import run_tasks, write_csv, count_possible_endings, score, mean_thinking_time, mean_stats
 
-def mcts_props(name, iterations, c):
+def mcts_props(c, iterations, name):
     return {
         "agent": "mcts",
-        "name": name,
+        "c": c,
         "iterations": iterations,
-        "c": c
+        "name": name
     }
 
 def make_tasks(id, player1, player2, games, seed):
@@ -44,7 +44,7 @@ def main():
     parser.add_argument("--iterations", type = int, default = 200)
     parser.add_argument("--games", type = int, default = 20)
     parser.add_argument("--c", type = float, nargs="+", default=[0.0, 0.25, 0.5, 1.0, math.sqrt(2), 2.0, 4.0])
-    parser.add_argument("--c-reference", type = float, default = math.sqrt(2))
+    parser.add_argument("--reference-c", type = float, default = math.sqrt(2))
     parser.add_argument("--round-robin", action = "store_true")
     parser.add_argument("--workers", type = int, default = None)
     parser.add_argument("--seed", type = int, default = 1)
@@ -57,7 +57,7 @@ def main():
 
     random = { "agent": "random", "name": "random" }
 
-    reference = mcts_props(args.reference_c, args.iterations, args.reference_c)
+    reference = mcts_props(args.reference_c, args.iterations, f"reference c = {args.reference_c:g}")
 
     # Random and reference c
 
@@ -71,18 +71,18 @@ def main():
         all_game_stats_reference += run_tasks(make_tasks("reference_c", candidate, reference, args.games, args.seed), args.workers, f"{names[c]} vs reference")
 
     write_csv(args.out + "_random_c.csv", all_game_stats_random)
-    write_csv(args.out + "_reference_c.cvs", all_game_stats_reference)
+    write_csv(args.out + "_reference_c.csv", all_game_stats_reference)
 
     print(f"UCT influence, {args.iterations} iterations / move, {args.games} games per pair. (win = 1, draw = 0.5, loss = 0)\n")
 
-    header = f"{'c':>7} | {'random':^17} | {'reference c = ' + format(args.reference_c, 'g') + ')':^17} | {'tree depth':>10} | {'best-move visit share':>20} | {'s / move':>7}"
+    header = f"{'c':>7} | {'random':^20} | {'reference (c = ' + format(args.reference_c, 'g') + ')':^20} | {'tree depth':>10} | {'best-move visit share':>21} | {'s / move':>7}"
     
     print(header)
     print("-" * len(header))
 
     for c in args.c:
         name = names[c]
-        print(f"{c:>7g} | {write_score(all_game_stats_random, name)} | {write_score(all_game_stats_reference, name)} | {mean_stats(all_game_stats_random + all_game_stats_reference, name, "depth"):>10.2f} | {mean_stats(all_game_stats_random + all_game_stats_reference, name, "best_move_fraction"):>21.3f} | {mean_thinking_time(all_game_stats_random + all_game_stats_reference, name):>7.3f}")
+        print(f"{c:>7g} | {write_score(all_game_stats_random, name)} | {write_score(all_game_stats_reference, name)} | {mean_stats(all_game_stats_random + all_game_stats_reference, name, "mean_tree_depth"):>10.2f} | {mean_stats(all_game_stats_random + all_game_stats_reference, name, "mean_best_visit_fraction"):>21.3f} | {mean_thinking_time(all_game_stats_random + all_game_stats_reference, name):>7.3f}")
 
     # Optional and round-robin AI
 
@@ -98,7 +98,7 @@ def main():
         write_csv(args.out + "_round_robin.csv", all_game_stats_rr)
 
         print("\nRound robin between c values:")
-        print(f"{'':>7}" + " ".join(f"{names[c]:>8}" for c in args.c) + "total")
+        print(f"{'':>7}" + " ".join(f"{names[c]:>12}" for c in args.c) + "total")
 
         for first_c in args.c:
             cells = []
@@ -106,7 +106,7 @@ def main():
 
             for second_c in args.c:
                 if first_c == second_c:
-                    cells.append(f"{'-':>8}")
+                    cells.append(f"{'-':>12}")
                     continue
 
                 pair = []
@@ -118,8 +118,8 @@ def main():
                 current_score = score(*count_possible_endings(pair, names[first_c]))
                 total += current_score
 
-                cells.append(f"{current_score:>8.2f}")
+                cells.append(f"{current_score:>12.2f}")
 
-            print(f"{names[first_c]:>7}" + " ".join(cells) + f"{total:.2f}")
+            print(f"{names[first_c]:>7}" + " ".join(cells) + f" {total:.2f}")
 
 if __name__ == "__main__": main()
