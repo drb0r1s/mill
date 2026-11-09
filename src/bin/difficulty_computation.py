@@ -5,8 +5,8 @@ import statistics
 
 from famnit_gym.envs import mill
 
-from mcts import MCTS
-from games.ai_vs_ai import write_csv
+from src.classes.mcts import MCTS
+from src.helpers.csv import write_csv
 
 INTERVALS = [
     ("[EARLY] placing [0, 9]", 0, 9),

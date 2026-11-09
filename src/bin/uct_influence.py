@@ -2,7 +2,9 @@ import argparse
 import math
 import itertools
 
-from games.ai_vs_ai import run_tasks, write_csv, count_possible_endings, score, mean_thinking_time, mean_stats
+from src.helpers.task import run_tasks
+from src.helpers.csv import write_csv
+from src.helpers.statistics import count_possible_endings, calculate_score, mean_thinking_time, mean_stats
 
 def mcts_props(c, iterations, name):
     return {
@@ -36,7 +38,7 @@ def make_tasks(id, player1, player2, games, seed):
 
 def write_score(all_game_stats, name):
     wins, draws, losses = count_possible_endings(all_game_stats, name)
-    return f"{wins:>3} / {draws:>2} / {losses:>3} {score(wins, draws, losses):.3f}"
+    return f"{wins:>3} / {draws:>2} / {losses:>3} {calculate_score(wins, draws, losses):.3f}"
 
 def main():
     parser = argparse.ArgumentParser(description = "UCT values influence over the game")
@@ -115,7 +117,7 @@ def main():
                     if {game_stats["player_1"], game_stats["player_2"]} == {names[first_c], names[second_c]}:
                         pair.append(game_stats)
 
-                current_score = score(*count_possible_endings(pair, names[first_c]))
+                current_score = calculate_score(*count_possible_endings(pair, names[first_c]))
                 total += current_score
 
                 cells.append(f"{current_score:>12.2f}")

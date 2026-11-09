@@ -1,8 +1,11 @@
 import argparse
 import itertools
 
-from data.difficulties import DIFFICULTIES
-from games.ai_vs_ai import run_tasks, write_csv, count_possible_endings, score, mean_thinking_time
+from src.helpers.task import run_tasks
+from src.helpers.csv import write_csv
+from src.helpers.statistics import count_possible_endings, calculate_score, mean_thinking_time
+
+from src.data.difficulties import DIFFICULTIES
 
 def main():
     parser = argparse.ArgumentParser(description = "AI difficulties competition")
@@ -65,7 +68,7 @@ def main():
             wins, draws, losses = count_possible_endings(pair, first_difficulty)
             points += wins + 0.5 * draws
 
-            cells.append(f"{score(wins, draws, losses):>8.2f}")
+            cells.append(f"{calculate_score(wins, draws, losses):>8.2f}")
 
         print(f"{first_difficulty:>8}" + " ".join(cells) + f"{points:>8.1f}")
 

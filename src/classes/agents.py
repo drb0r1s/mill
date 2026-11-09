@@ -1,6 +1,6 @@
 import random as r
 
-from mcts import MCTS
+from src.classes.mcts import MCTS
 
 class RandomAgent:
     __slots__ = ("name", "random")
