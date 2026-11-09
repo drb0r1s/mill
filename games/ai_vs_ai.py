@@ -80,7 +80,7 @@ def play_task(task):
     result = agent_play(agent1, agent2)
 
     game_stats = {
-        "tag": task.get("tag"),
+        "id": task.get("id"),
         "game": task["game"],
         "seed": task["seed"],
         "player_1": agent1.name,
