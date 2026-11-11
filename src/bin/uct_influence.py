@@ -2,7 +2,6 @@
 
 import argparse
 import math
-import itertools
 
 from src.helpers.task import run_tasks
 from src.helpers.csv import write_csv
