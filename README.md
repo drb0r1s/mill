@@ -39,7 +39,7 @@ python -m src.bin.difficulty_competition --games 10 --seed 1
 
 **3. Computation time**
 ```
-python -m src.bin.difficulty_computation --iterations 10 15 25 50 100 150 200 500 1000 --positions 10 --seed 1
+python -m src.bin.difficulty_computation --iterations 15 350 750 1500 --positions 10 --seed 1
 ```
 
 **4. Human vs AI** (use `--side 2` to play second)
