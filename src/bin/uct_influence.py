@@ -88,42 +88,4 @@ def main():
         name = names[c]
         print(f"{c:>7g} | {write_score(all_game_stats_random, name)} | {write_score(all_game_stats_reference, name)} | {mean_stats(all_game_stats_random + all_game_stats_reference, name, "mean_tree_depth"):>10.2f} | {mean_stats(all_game_stats_random + all_game_stats_reference, name, "mean_best_visit_fraction"):>21.3f} | {mean_thinking_time(all_game_stats_random + all_game_stats_reference, name):>7.3f}")
 
-    # Optional and round-robin AI
-
-    if args.round_robin:
-        all_game_stats_rr = []
-
-        for first_c, second_c in itertools.combinations(args.c, 2):
-            first_candidate = mcts_props(first_c, args.iterations, names[first_c])
-            second_candidate = mcts_props(second_c, args.iterations, names[second_c])
-
-            all_game_stats_rr += run_tasks(make_tasks("round_robin", first_candidate, second_candidate, args.games, args.seed), args.workers, f"{names[first_c]} vs {names[second_c]}")
-
-        write_csv(args.out + "_round_robin.csv", all_game_stats_rr)
-
-        print("\nRound robin between c values:")
-        print(f"{'':>7}" + " ".join(f"{names[c]:>12}" for c in args.c) + "total")
-
-        for first_c in args.c:
-            cells = []
-            total = 0.0
-
-            for second_c in args.c:
-                if first_c == second_c:
-                    cells.append(f"{'-':>12}")
-                    continue
-
-                pair = []
-                        
-                for game_stats in all_game_stats_rr:
-                    if {game_stats["player_1"], game_stats["player_2"]} == {names[first_c], names[second_c]}:
-                        pair.append(game_stats)
-
-                current_score = calculate_score(*count_possible_endings(pair, names[first_c]))
-                total += current_score
-
-                cells.append(f"{current_score:>12.2f}")
-
-            print(f"{names[first_c]:>7}" + " ".join(cells) + f" {total:.2f}")
-
 if __name__ == "__main__": main()
